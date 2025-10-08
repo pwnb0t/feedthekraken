@@ -217,9 +217,13 @@ Meteor.methods({
       throw new Meteor.Error('not-authorized', 'Only the host can start this');
     }
 
-    // 3 second countdown
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    // Reset all players' ready status
+    const allPlayers = await Players.find({ gameId }).fetchAsync();
+    for (const p of allPlayers) {
+      await Players.updateAsync(p._id!, { $set: { isReady: false } });
+    }
 
+    // Immediately transition to InProgress state
     await Games.updateAsync(gameId, { $set: { gameState: GameState.CultConversionInProgress } });
   },
 

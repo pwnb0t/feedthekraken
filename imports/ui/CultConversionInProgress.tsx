@@ -22,6 +22,18 @@ export const CultConversionInProgress: React.FC<CultConversionInProgressProps> =
 }) => {
   const [converting, setConverting] = useState(false);
   const [countdown, setCountdown] = useState(3);
+  const [cultLeaderReady, setCultLeaderReady] = useState(false);
+
+  // 5 second delay before showing cult leader view
+  useEffect(() => {
+    if (playerRole === Role.CultLeader) {
+      const timer = setTimeout(() => {
+        setCultLeaderReady(true);
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [playerRole]);
 
   useEffect(() => {
     if (converting && countdown > 0) {
@@ -37,21 +49,17 @@ export const CultConversionInProgress: React.FC<CultConversionInProgressProps> =
     setConverting(true);
   };
 
-  if (playerRole !== Role.CultLeader) {
+  // Show "Eyes closed" to everyone initially, including cult leader for first 5 seconds
+  // Also show "Close your eyes" after conversion
+  if (playerRole !== Role.CultLeader || !cultLeaderReady || converting) {
     return (
       <div style={{ padding: '2rem', textAlign: 'center' }}>
-        <h2>Eyes closed</h2>
-      </div>
-    );
-  }
-
-  if (converting) {
-    return (
-      <div style={{ padding: '2rem', textAlign: 'center' }}>
-        <h2>Close your eyes</h2>
-        <p style={{ fontSize: '1.5rem', marginTop: '2rem' }}>
-          Moving to results screen in {countdown}...
-        </p>
+        <h2>{converting ? 'Close your eyes' : 'Eyes closed'}</h2>
+        {converting && (
+          <p style={{ fontSize: '1.5rem', marginTop: '2rem' }}>
+            Moving to results screen in {countdown}...
+          </p>
+        )}
       </div>
     );
   }
