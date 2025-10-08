@@ -314,28 +314,54 @@ On the host phone, there is a "New Game" button that will start a new game.
 
 # New TODO stuff to be fixed/changed
 
-## Fixes
+## Login screen
 
-Final screen is not working properly. Need to investigate it further then fix.
+Only search for games created in the last 24 hr that are not in game over state
 
-Make cult leader screen on CultConversion show all players and have ineligible ones show "Ineligible"
 
-## Additions
+## Game Setup
 
 During role selection, verify the roles.
 During role selection, add a "Go back to role selection" button. Possibly make this a new state.
-
-The countdowns are not working as well as I wanted them to. Need feedback on them at the very least. Possibly new states.
-First need to go find all of them, so that will be the first step of this fix.
-
-Add Host config/admin screen/panel.
-- Add a way to modify the players in the game (add/remove players, go back to role screen, etc.)
-- Turn sound host-only/all/off (vibration stays on)
-
-Add way to start a new game with the current players.
 
 
 On Game Setup screen, on the host phone, add a message about "host should have their volumed turned up for sounds"
 Add vibration to all
 Add a way to disable sound
+
+
+## Cult Gun Stash
+
+Need to change how the ready button, undo button, and "waiting" message work.
+    "3/5 players ready..." on first line
+    Ready/Undo on second line
+    "Start" button on third line for host
+
+Needs result screen with ready button.
+
+
+## Cult Conversion
+
+
+The countdowns are not working as well as I wanted them to. Need feedback on them at the very least. Possibly new states.
+First need to go find all of them, so that will be the first step of this fix.
+    "Start Cult Conversion Step" button
+
+Make cult leader screen on CultConversion show all players and have ineligible ones show "Ineligible"
+
+Change "Hide Role" to be a "Ready" button. Still hides role. Host auto moves on when all players are ready.
+
+
+## Host Game Config panel
+
+Add Host config/admin screen/panel.
+- Add a way to modify the players in the game (add/remove players, go back to role screen, etc.)
+- Turn sound host-only/all/off (vibration stays on)
+
+## Game Over screen
+
+Final screen is not working properly. Need to investigate it further then fix.
+
+Add way to start a new game with the current players.
+
 

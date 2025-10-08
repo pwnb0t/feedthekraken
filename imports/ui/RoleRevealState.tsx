@@ -34,11 +34,11 @@ export const RoleRevealState: React.FC<RoleRevealStateProps> = ({
     } else if (!revealed && countdown === 0) {
       setRevealed(true);
       
-      // Host automatically returns to InProgress after 3 seconds
+      // Host automatically returns to InProgress after X seconds
       if (isHost) {
         setTimeout(() => {
           Meteor.call('games.finishRoleReveal', gameId, playerId);
-        }, 3000);
+        }, 5000);
       }
     }
   }, [countdown, revealed, isHost, gameId, playerId]);
@@ -93,7 +93,7 @@ export const RoleRevealState: React.FC<RoleRevealStateProps> = ({
           cursor: 'pointer',
         }}
       >
-        Ok
+        Hide Role
       </button>
     </div>
   );
