@@ -180,6 +180,24 @@ Meteor.methods({
       }
     }
 
+    // Reset all players' ready status
+    const allPlayers = await Players.find({ gameId }).fetchAsync();
+    for (const p of allPlayers) {
+      await Players.updateAsync(p._id!, { $set: { isReady: false } });
+    }
+
+    await Games.updateAsync(gameId, { $set: { gameState: GameState.CultGunStashResults } });
+  },
+
+  async 'games.finishCultGunStashResults'(gameId: string) {
+    check(gameId, String);
+
+    // Reset all players' ready status
+    const allPlayers = await Players.find({ gameId }).fetchAsync();
+    for (const p of allPlayers) {
+      await Players.updateAsync(p._id!, { $set: { isReady: false } });
+    }
+
     await Games.updateAsync(gameId, { $set: { gameState: GameState.InProgress } });
   },
 

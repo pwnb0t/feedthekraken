@@ -28,7 +28,7 @@ export const CultGunStashInProgress: React.FC<CultGunStashInProgressProps> = ({
   const distributedGuns = Object.values(distributed).reduce((sum, count) => sum + count, 0);
   const remainingGuns = totalGuns - distributedGuns;
 
-  // 5 second delay before showing cult leader view
+  // 5-second delay before showing cult leader view
   useEffect(() => {
     if (playerRole === Role.CultLeader) {
       const timer = setTimeout(() => {
@@ -41,8 +41,7 @@ export const CultGunStashInProgress: React.FC<CultGunStashInProgressProps> = ({
 
   useEffect(() => {
     if (playerRole === Role.CultLeader && cultLeaderReady && remainingGuns === 0) {
-      // Random delay between 2-5 seconds
-      const delay = 2000 + Math.random() * 3000;
+      const delay = 3000;
       const timer = setTimeout(() => {
         // Play sound on host device only
         const audio = new Audio('/assets/boat-horn.mp3');

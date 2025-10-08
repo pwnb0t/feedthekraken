@@ -6,6 +6,7 @@ export enum GameState {
   InProgress = 'InProgress',
   CultGunStashSetup = 'CultGunStashSetup',
   CultGunStashInProgress = 'CultGunStashInProgress',
+  CultGunStashResults = 'CultGunStashResults',
   CultConversionSetup = 'CultConversionSetup',
   CultConversionInProgress = 'CultConversionInProgress',
   RoleReveal = 'RoleReveal',

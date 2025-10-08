@@ -8,6 +8,7 @@ import { WaitingState } from './WaitingState';
 import { InProgressState } from './InProgressState';
 import { CultGunStashSetup } from './CultGunStashSetup';
 import { CultGunStashInProgress } from './CultGunStashInProgress';
+import { CultGunStashResults } from './CultGunStashResults';
 import { CultConversionSetup } from './CultConversionSetup';
 import { CultConversionInProgress } from './CultConversionInProgress';
 import { RoleRevealState } from './RoleRevealState';
@@ -92,6 +93,10 @@ export const GameScreen: React.FC<GameScreenProps> = ({ gameId, playerId }) => {
           playerRole={player!.role}
           allPlayers={allPlayers}
         />
+      )}
+
+      {game!.gameState === GameState.CultGunStashResults && (
+        <CultGunStashResults gameId={gameId} playerId={playerId} gunCount={player!.gunCount} />
       )}
 
       {game!.gameState === GameState.CultConversionSetup && (
