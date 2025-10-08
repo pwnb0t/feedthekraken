@@ -137,7 +137,7 @@ export const CultGunStashSetup: React.FC<CultGunStashSetupProps> = ({
               cursor: allReady ? 'pointer' : 'not-allowed',
             }}
           >
-            Start Cult Gun Stash Distribution
+            Tap this button and count to 5
           </button>
         </>
       )}

@@ -64,7 +64,8 @@ export const CultGunStashInProgress: React.FC<CultGunStashInProgressProps> = ({
   };
 
   // Show "Eyes closed" to everyone initially, including cult leader for first 5 seconds
-  if (playerRole !== Role.CultLeader || !cultLeaderReady) {
+  // Also show "Eyes closed" to cult leader after all guns are distributed
+  if (playerRole !== Role.CultLeader || !cultLeaderReady || remainingGuns === 0) {
     return (
       <div style={{ padding: '2rem', textAlign: 'center' }}>
         <h2>Eyes closed.</h2>
