@@ -318,6 +318,8 @@ On the host phone, there is a "New Game" button that will start a new game.
 
 Only search for games created in the last 24 hr that are not in game over state
 
+Needing to enter name to create new game is awkward. Need to make this better.
+
 
 ## Game Setup
 

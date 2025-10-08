@@ -22,27 +22,39 @@ export const CultGunStashInProgress: React.FC<CultGunStashInProgressProps> = ({
   allPlayers,
 }) => {
   const [distributed, setDistributed] = useState<{ [key: string]: number }>({});
+  const [cultLeaderReady, setCultLeaderReady] = useState(false);
 
   const totalGuns = 3; // Always 3 guns to distribute
   const distributedGuns = Object.values(distributed).reduce((sum, count) => sum + count, 0);
   const remainingGuns = totalGuns - distributedGuns;
 
+  // 5 second delay before showing cult leader view
   useEffect(() => {
-    if (playerRole === Role.CultLeader && remainingGuns === 0) {
+    if (playerRole === Role.CultLeader) {
+      const timer = setTimeout(() => {
+        setCultLeaderReady(true);
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [playerRole]);
+
+  useEffect(() => {
+    if (playerRole === Role.CultLeader && cultLeaderReady && remainingGuns === 0) {
       // Random delay between 2-5 seconds
       const delay = 2000 + Math.random() * 3000;
       const timer = setTimeout(() => {
         // Play sound on host device only
         const audio = new Audio('/assets/boat-horn.mp3');
         audio.play();
-        
+
         // Save distributed guns and return to InProgress
         Meteor.call('games.finishCultGunStash', gameId, playerId, distributed);
       }, delay);
 
       return () => clearTimeout(timer);
     }
-  }, [remainingGuns, totalGuns, playerRole, gameId, playerId, distributed]);
+  }, [remainingGuns, cultLeaderReady, playerRole, gameId, playerId, distributed]);
 
   const handleAddGun = (targetPlayerId: string) => {
     setDistributed((prev) => ({
@@ -51,7 +63,8 @@ export const CultGunStashInProgress: React.FC<CultGunStashInProgressProps> = ({
     }));
   };
 
-  if (playerRole !== Role.CultLeader) {
+  // Show "Eyes closed" to everyone initially, including cult leader for first 5 seconds
+  if (playerRole !== Role.CultLeader || !cultLeaderReady) {
     return (
       <div style={{ padding: '2rem', textAlign: 'center' }}>
         <h2>Eyes closed.</h2>

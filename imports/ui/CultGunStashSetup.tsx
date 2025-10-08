@@ -108,22 +108,38 @@ export const CultGunStashSetup: React.FC<CultGunStashSetupProps> = ({
       </button>
 
       {isHost && (
-        <button
-          onClick={handleStart}
-          disabled={!allReady}
-          style={{
-            width: '100%',
-            padding: '0.75rem',
-            fontSize: '1rem',
-            backgroundColor: allReady ? '#28a745' : '#6c757d',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: allReady ? 'pointer' : 'not-allowed',
-          }}
-        >
-          Start Cult Gun Stash Distribution
-        </button>
+        <>
+          <div
+            style={{
+              padding: '1rem',
+              marginBottom: '1rem',
+              backgroundColor: '#f8f9fa',
+              border: '1px solid #dee2e6',
+              borderRadius: '4px',
+              fontSize: '0.9rem',
+              lineHeight: '1.5',
+            }}
+          >
+            <strong>Read aloud when ready:</strong> Everyone close your eyes. After I count to 5, Cult
+            Leader, open your eyes and distribute guns, then close your eyes when prompted.
+          </div>
+          <button
+            onClick={handleStart}
+            disabled={!allReady}
+            style={{
+              width: '100%',
+              padding: '0.75rem',
+              fontSize: '1rem',
+              backgroundColor: allReady ? '#28a745' : '#6c757d',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: allReady ? 'pointer' : 'not-allowed',
+            }}
+          >
+            Start Cult Gun Stash Distribution
+          </button>
+        </>
       )}
     </div>
   );

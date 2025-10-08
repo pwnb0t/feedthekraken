@@ -152,9 +152,7 @@ Meteor.methods({
       await Players.updateAsync(p._id!, { $set: { isReady: false } });
     }
 
-    // 3 second countdown
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-
+    // Immediately transition to InProgress state
     await Games.updateAsync(gameId, { $set: { gameState: GameState.CultGunStashInProgress } });
   },
 
