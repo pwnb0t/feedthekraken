@@ -1,4 +1,5 @@
 ﻿import React from 'react';
+import { Meteor } from 'meteor/meteor';
 import { useTracker } from 'meteor/react-meteor-data';
 import { Games, Players, GameState, Role } from '../api/collections';
 import { GameHeader } from './GameHeader';
@@ -12,6 +13,14 @@ interface GameScreenProps {
 
 export const GameScreen: React.FC<GameScreenProps> = ({ gameId, playerId }) => {
   const { game, player, allPlayers, loading } = useTracker(() => {
+    const gameSub = Meteor.subscribe('game', gameId);
+    const playersSub = Meteor.subscribe('players', gameId);
+    const playerSub = Meteor.subscribe('player', playerId);
+
+    if (!gameSub.ready() || !playersSub.ready() || !playerSub.ready()) {
+      return { game: null, player: null, allPlayers: [], loading: true };
+    }
+
     const game = Games.findOne(gameId);
     const player = Players.findOne(playerId);
     const allPlayers = Players.find({ gameId }).fetch();
