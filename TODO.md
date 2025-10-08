@@ -332,11 +332,6 @@ Add a way to disable sound
 
 ## Cult Gun Stash
 
-Need to change how the ready button, undo button, and "waiting" message work.
-    "3/5 players ready..." on first line
-    Ready/Undo on second line
-    "Start" button on third line for host
-
 Needs result screen with ready button.
 
 
