@@ -10,7 +10,7 @@ export enum GameState {
   CultConversionSetup = 'CultConversionSetup',
   CultConversionInProgress = 'CultConversionInProgress',
   RoleReveal = 'RoleReveal',
-  Finished = 'Finished',
+  GameOver = 'GameOver',
 }
 
 export enum Role {

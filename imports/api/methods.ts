@@ -257,4 +257,78 @@ Meteor.methods({
 
     await Games.updateAsync(gameId, { $set: { gameState: GameState.InProgress } });
   },
+
+  async 'games.newGameSamePlayers'(gameId: string, playerId: string) {
+    check(gameId, String);
+    check(playerId, String);
+
+    const player = await Players.findOneAsync(playerId);
+    if (!player || !player.isHost) {
+      throw new Meteor.Error('not-authorized', 'Only the host can start a new game');
+    }
+
+    // Reset all players to initial state
+    const allPlayers = await Players.find({ gameId }).fetchAsync();
+    for (const p of allPlayers) {
+      await Players.updateAsync(p._id!, {
+        $set: {
+          role: Role.None,
+          isConvertEligible: false,
+          gunCount: 0,
+          isReady: false,
+        },
+      });
+    }
+
+    // Move to Waiting state so players can choose their roles
+    await Games.updateAsync(gameId, { $set: { gameState: GameState.Waiting } });
+  },
+
+  async 'games.newGameDifferentPlayers'(gameId: string, playerId: string) {
+    check(gameId, String);
+    check(playerId, String);
+
+    const player = await Players.findOneAsync(playerId);
+    if (!player || !player.isHost) {
+      throw new Meteor.Error('not-authorized', 'Only the host can start a new game');
+    }
+
+    const game = await Games.findOneAsync(gameId);
+    if (!game) {
+      throw new Meteor.Error('game-not-found', 'Game not found');
+    }
+
+    // Generate a new room code
+    const roomCode = generateRoomCode();
+
+    // Remove all non-host players
+    const allPlayers = await Players.find({ gameId }).fetchAsync();
+    for (const p of allPlayers) {
+      if (!p.isHost) {
+        await Players.removeAsync(p._id!);
+      }
+    }
+
+    // Reset host player to initial state
+    await Players.updateAsync(playerId, {
+      $set: {
+        role: Role.None,
+        isConvertEligible: false,
+        gunCount: 0,
+        isReady: false,
+      },
+    });
+
+    // Update game with new room code and reset to Setup state
+    await Games.updateAsync(gameId, {
+      $set: {
+        roomCode,
+        numberOfPlayers: 5, // Reset to default
+        gameState: GameState.Setup,
+        players: [playerId], // Only host remains
+      },
+    });
+
+    return { roomCode };
+  },
 });

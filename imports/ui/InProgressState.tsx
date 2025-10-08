@@ -15,7 +15,7 @@ export const InProgressState: React.FC<InProgressStateProps> = ({ gameId, player
 
   const handleEndGame = () => {
     if (confirm('Are you sure you want to end the game?')) {
-      Meteor.call('games.setGameState', gameId, playerId, GameState.Finished);
+      Meteor.call('games.setGameState', gameId, playerId, GameState.GameOver);
     }
   };
 

@@ -12,6 +12,7 @@ import { CultGunStashResults } from './CultGunStashResults';
 import { CultConversionSetup } from './CultConversionSetup';
 import { CultConversionInProgress } from './CultConversionInProgress';
 import { RoleRevealState } from './RoleRevealState';
+import { GameOverState } from './GameOverState';
 
 interface GameScreenProps {
   gameId: string;
@@ -123,6 +124,15 @@ export const GameScreen: React.FC<GameScreenProps> = ({ gameId, playerId }) => {
           playerId={playerId}
           isHost={player!.isHost}
           playerRole={player!.role}
+        />
+      )}
+
+      {game!.gameState === GameState.GameOver && (
+        <GameOverState
+          gameId={gameId}
+          playerId={playerId}
+          isHost={player!.isHost}
+          allPlayers={allPlayers.map((p) => ({ name: p.name, role: p.role }))}
         />
       )}
     </div>
