@@ -3,7 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import { Role } from '../api/collections';
 
 interface EligiblePlayer {
-  _id: string;
+  _id?: string;
   name: string;
 }
 
@@ -89,34 +89,37 @@ export const CultConversionInProgress: React.FC<CultConversionInProgressProps> =
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          {eligiblePlayers.map((player) => (
-            <div
-              key={player._id}
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '0.75rem',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-              }}
-            >
-              <span>{player.name}</span>
-              <button
-                onClick={() => handleConvert(player._id)}
+          {eligiblePlayers.map((player) => {
+            if (!player._id) return null;
+            return (
+              <div
+                key={player._id}
                 style={{
-                  padding: '0.5rem 1rem',
-                  backgroundColor: '#6f42c1',
-                  color: 'white',
-                  border: 'none',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '0.75rem',
+                  border: '1px solid #ccc',
                   borderRadius: '4px',
-                  cursor: 'pointer',
                 }}
               >
-                Convert
-              </button>
-            </div>
-          ))}
+                <span>{player.name}</span>
+                <button
+                  onClick={() => handleConvert(player._id!)}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    backgroundColor: '#6f42c1',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Convert
+                </button>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

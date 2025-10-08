@@ -334,15 +334,9 @@ Add a way to disable sound
 
 ## Cult Gun Stash
 
-Needs result screen with ready button.
-
 
 ## Cult Conversion
 
-
-The countdowns are not working as well as I wanted them to. Need feedback on them at the very least. Possibly new states.
-First need to go find all of them, so that will be the first step of this fix.
-    "Start Cult Conversion Step" button
 
 Make cult leader screen on CultConversion show all players and have ineligible ones show "Ineligible"
 

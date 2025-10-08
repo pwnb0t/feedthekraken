@@ -3,7 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import { Role } from '../api/collections';
 
 interface PlayerWithGuns {
-  _id: string;
+  _id?: string;
   name: string;
   gunCount: number;
 }
@@ -80,38 +80,41 @@ export const CultGunStashInProgress: React.FC<CultGunStashInProgressProps> = ({
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-        {allPlayers.map((player) => (
-          <div
-            key={player._id}
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              padding: '0.75rem',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-            }}
-          >
-            <span>{player.name}</span>
-            <span style={{ marginLeft: 'auto', marginRight: '1rem' }}>
-              {player.gunCount} + {distributed[player._id] || 0}
-            </span>
-            <button
-              onClick={() => handleAddGun(player._id)}
-              disabled={remainingGuns === 0}
+        {allPlayers.map((player) => {
+          if (!player._id) return null;
+          return (
+            <div
+              key={player._id}
               style={{
-                padding: '0.5rem 1rem',
-                backgroundColor: remainingGuns === 0 ? '#ccc' : '#007bff',
-                color: 'white',
-                border: 'none',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '0.75rem',
+                border: '1px solid #ccc',
                 borderRadius: '4px',
-                cursor: remainingGuns === 0 ? 'not-allowed' : 'pointer',
               }}
             >
-              +
-            </button>
-          </div>
-        ))}
+              <span>{player.name}</span>
+              <span style={{ marginLeft: 'auto', marginRight: '1rem' }}>
+                {player.gunCount} + {distributed[player._id] || 0}
+              </span>
+              <button
+                onClick={() => handleAddGun(player._id!)}
+                disabled={remainingGuns === 0}
+                style={{
+                  padding: '0.5rem 1rem',
+                  backgroundColor: remainingGuns === 0 ? '#ccc' : '#007bff',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: remainingGuns === 0 ? 'not-allowed' : 'pointer',
+                }}
+              >
+                +
+              </button>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
