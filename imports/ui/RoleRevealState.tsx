@@ -50,7 +50,6 @@ export const RoleRevealState: React.FC<RoleRevealStateProps> = ({
 
   const handleReady = () => {
     Meteor.call('players.setReady', playerId, true);
-    setRevealed(false);
   };
 
   const getRoleLabel = (role: Role) => {
@@ -68,59 +67,77 @@ export const RoleRevealState: React.FC<RoleRevealStateProps> = ({
     }
   };
 
+  // If ready, show hidden role and waiting message
+  if (isReady) {
+    return (
+      <div style={{ padding: '2rem', maxWidth: '400px', margin: '0 auto' }}>
+        <h2 style={{ textAlign: 'center', marginBottom: '2rem' }}>Role: &lt;hidden&gt;</h2>
+
+        <div style={{ textAlign: 'center', marginBottom: '1rem', fontSize: '1rem' }}>
+          {readyCount}/{totalPlayers} players ready...
+        </div>
+
+        <button
+          disabled
+          style={{
+            width: '100%',
+            padding: '0.75rem',
+            fontSize: '1rem',
+            backgroundColor: '#6c757d',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'not-allowed',
+          }}
+        >
+          Waiting...
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div style={{ padding: '2rem', maxWidth: '400px', margin: '0 auto' }}>
-      {revealed ? (
-        <>
-          <h2 style={{ textAlign: 'center', marginBottom: '2rem' }}>
-            Role: {getRoleLabel(playerRole)}
-          </h2>
+      <h2 style={{ textAlign: 'center', marginBottom: '2rem' }}>
+        Role: {revealed ? getRoleLabel(playerRole) : '<hidden>'}
+      </h2>
 
-          <div style={{ textAlign: 'center', marginBottom: '1rem', fontSize: '1rem' }}>
-            {readyCount}/{totalPlayers} players ready...
-          </div>
+      <div style={{ textAlign: 'center', marginBottom: '1rem', fontSize: '1rem' }}>
+        {readyCount}/{totalPlayers} players ready...
+      </div>
 
-          <button
-            onClick={handleReady}
-            disabled={isReady}
-            style={{
-              width: '100%',
-              padding: '0.75rem',
-              fontSize: '1rem',
-              backgroundColor: isReady ? '#6c757d' : '#28a745',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: isReady ? 'not-allowed' : 'pointer',
-            }}
-          >
-            {isReady ? 'Waiting...' : 'Ready (hides role)'}
-          </button>
-        </>
+      {!revealed ? (
+        <button
+          onClick={handleReveal}
+          style={{
+            width: '100%',
+            padding: '0.75rem',
+            fontSize: '1rem',
+            backgroundColor: '#007bff',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+          }}
+        >
+          Reveal Role
+        </button>
       ) : (
-        <>
-          <h2 style={{ textAlign: 'center', marginBottom: '2rem' }}>Role Reveal</h2>
-
-          <div style={{ textAlign: 'center', marginBottom: '1rem', fontSize: '1rem' }}>
-            {readyCount}/{totalPlayers} players ready...
-          </div>
-
-          <button
-            onClick={handleReveal}
-            style={{
-              width: '100%',
-              padding: '0.75rem',
-              fontSize: '1rem',
-              backgroundColor: '#007bff',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-            }}
-          >
-            Reveal Role
-          </button>
-        </>
+        <button
+          onClick={handleReady}
+          style={{
+            width: '100%',
+            padding: '0.75rem',
+            fontSize: '1rem',
+            backgroundColor: '#28a745',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+          }}
+        >
+          Ready (hides role)
+        </button>
       )}
     </div>
   );
