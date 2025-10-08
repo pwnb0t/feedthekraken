@@ -1,4 +1,4 @@
-﻿import React from 'react';
+﻿import React, { useEffect } from 'react';
 import { Meteor } from 'meteor/meteor';
 import { useTracker } from 'meteor/react-meteor-data';
 import { Games, Players, GameState, Role } from '../api/collections';
@@ -13,6 +13,7 @@ import { CultConversionSetup } from './CultConversionSetup';
 import { CultConversionInProgress } from './CultConversionInProgress';
 import { RoleRevealState } from './RoleRevealState';
 import { GameOverState } from './GameOverState';
+import { clearSession, saveSession } from '../utils/sessionStorage';
 
 interface GameScreenProps {
   gameId: string;
@@ -40,6 +41,27 @@ export const GameScreen: React.FC<GameScreenProps> = ({ gameId, playerId }) => {
       loading: !game || !player,
     };
   }, [gameId, playerId]);
+
+  // Clear session if game or player no longer exists
+  useEffect(() => {
+    if (!loading && (!game || !player)) {
+      clearSession();
+      // Reload to go back to landing page
+      window.location.reload();
+    }
+  }, [loading, game, player]);
+
+  // Update session whenever game or player data changes
+  useEffect(() => {
+    if (game && player) {
+      saveSession({
+        roomCode: game.roomCode,
+        playerName: player.name,
+        gameId: game._id!,
+        playerId: player._id!,
+      });
+    }
+  }, [game?.roomCode, player?.name, game?._id, player?._id]);
 
   if (loading) {
     return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>;

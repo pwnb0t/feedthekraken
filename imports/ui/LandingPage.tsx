@@ -1,4 +1,5 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
+import { loadSession } from '../utils/sessionStorage';
 
 interface LandingPageProps {
   onJoinGame: (roomCode: string, playerName: string) => void;
@@ -8,6 +9,15 @@ interface LandingPageProps {
 export const LandingPage: React.FC<LandingPageProps> = ({ onJoinGame, onCreateGame }) => {
   const [roomCode, setRoomCode] = useState('');
   const [name, setName] = useState('');
+
+  // Pre-populate fields from saved session if available
+  useEffect(() => {
+    const session = loadSession();
+    if (session) {
+      setRoomCode(session.roomCode);
+      setName(session.playerName);
+    }
+  }, []);
 
   const handlePlay = (e: React.FormEvent) => {
     e.preventDefault();
