@@ -1,14 +1,13 @@
-﻿import React, { useState } from 'react';
-import { Meteor } from 'meteor/meteor';
-import { useTracker } from 'meteor/react-meteor-data';
-import { Players, Role } from '../api/collections';
+﻿import React from 'react';
+import {Meteor} from 'meteor/meteor';
+import {useTracker} from 'meteor/react-meteor-data';
+import {Players, Role} from '../api/collections';
 
 interface CultConversionSetupProps {
   gameId: string;
   playerId: string;
   isHost: boolean;
   playerRole: Role;
-  isConvertEligible: boolean;
 }
 
 export const CultConversionSetup: React.FC<CultConversionSetupProps> = ({
@@ -16,10 +15,7 @@ export const CultConversionSetup: React.FC<CultConversionSetupProps> = ({
   playerId,
   isHost,
   playerRole,
-  isConvertEligible,
 }) => {
-  const [answered, setAnswered] = useState(false);
-
   const { allPlayers, currentPlayer } = useTracker(() => {
     const allPlayers = Players.find({ gameId }).fetch();
     const currentPlayer = Players.findOne(playerId);
@@ -29,7 +25,8 @@ export const CultConversionSetup: React.FC<CultConversionSetupProps> = ({
   const readyCount = allPlayers.filter((p) => p.isReady).length;
   const totalPlayers = allPlayers.length;
   const allReady = readyCount === totalPlayers;
-  const isReady = currentPlayer?.isReady || false;
+    // Use isReady from the database as the source of truth for answered state
+  const answered = currentPlayer?.isReady || false;
 
   const handleAnswer = (eligible: boolean) => {
     // Cult leader and cultists are always ineligible
@@ -38,12 +35,10 @@ export const CultConversionSetup: React.FC<CultConversionSetupProps> = ({
 
     Meteor.call('players.setConvertEligible', playerId, actualEligibility);
     Meteor.call('players.setReady', playerId, true);
-    setAnswered(true);
   };
 
   const handleUnready = () => {
     Meteor.call('players.setReady', playerId, false);
-    setAnswered(false);
   };
 
   const handleStart = () => {

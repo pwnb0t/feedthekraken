@@ -105,7 +105,6 @@ export const GameScreen: React.FC<GameScreenProps> = ({ gameId, playerId }) => {
           playerId={playerId}
           isHost={player!.isHost}
           playerRole={player!.role}
-          isConvertEligible={player!.isConvertEligible}
         />
       )}
 
