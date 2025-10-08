@@ -5,6 +5,12 @@ import { Games, Players, GameState, Role } from '../api/collections';
 import { GameHeader } from './GameHeader';
 import { SetupState } from './SetupState';
 import { WaitingState } from './WaitingState';
+import { InProgressState } from './InProgressState';
+import { CultGunStashSetup } from './CultGunStashSetup';
+import { CultGunStashInProgress } from './CultGunStashInProgress';
+import { CultConversionSetup } from './CultConversionSetup';
+import { CultConversionInProgress } from './CultConversionInProgress';
+import { RoleRevealState } from './RoleRevealState';
 
 interface GameScreenProps {
   gameId: string;
@@ -38,6 +44,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({ gameId, playerId }) => {
   }
 
   const playersWithRoles = allPlayers.filter((p) => p.role !== Role.None).length;
+  const eligiblePlayers = allPlayers.filter((p) => p.isConvertEligible);
 
   return (
     <div>
@@ -66,10 +73,53 @@ export const GameScreen: React.FC<GameScreenProps> = ({ gameId, playerId }) => {
       )}
 
       {game!.gameState === GameState.InProgress && (
-        <div style={{ padding: '2rem', textAlign: 'center' }}>
-          <h2>Game In Progress</h2>
-          <p>Phase 2 features coming soon...</p>
-        </div>
+        <InProgressState gameId={gameId} playerId={playerId} isHost={player!.isHost} />
+      )}
+
+      {game!.gameState === GameState.CultGunStashSetup && (
+        <CultGunStashSetup
+          gameId={gameId}
+          playerId={playerId}
+          isHost={player!.isHost}
+          gunCount={player!.gunCount}
+        />
+      )}
+
+      {game!.gameState === GameState.CultGunStashInProgress && (
+        <CultGunStashInProgress
+          gameId={gameId}
+          playerId={playerId}
+          playerRole={player!.role}
+          allPlayers={allPlayers}
+        />
+      )}
+
+      {game!.gameState === GameState.CultConversionSetup && (
+        <CultConversionSetup
+          gameId={gameId}
+          playerId={playerId}
+          isHost={player!.isHost}
+          playerRole={player!.role}
+          isConvertEligible={player!.isConvertEligible}
+        />
+      )}
+
+      {game!.gameState === GameState.CultConversionInProgress && (
+        <CultConversionInProgress
+          gameId={gameId}
+          playerId={playerId}
+          playerRole={player!.role}
+          eligiblePlayers={eligiblePlayers}
+        />
+      )}
+
+      {game!.gameState === GameState.RoleReveal && (
+        <RoleRevealState
+          gameId={gameId}
+          playerId={playerId}
+          isHost={player!.isHost}
+          playerRole={player!.role}
+        />
       )}
     </div>
   );

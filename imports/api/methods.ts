@@ -107,4 +107,118 @@ Meteor.methods({
 
     await Games.updateAsync(gameId, { $set: { gameState: GameState.InProgress } });
   },
+
+  async 'games.setGameState'(gameId: string, playerId: string, newState: GameState) {
+    check(gameId, String);
+    check(playerId, String);
+    check(newState, String);
+
+    const player = await Players.findOneAsync(playerId);
+    if (!player || !player.isHost) {
+      throw new Meteor.Error('not-authorized', 'Only the host can change game state');
+    }
+
+    await Games.updateAsync(gameId, { $set: { gameState: newState } });
+  },
+
+  async 'players.setGunCount'(playerId: string, gunCount: number) {
+    check(playerId, String);
+    check(gunCount, Number);
+
+    await Players.updateAsync(playerId, { $set: { gunCount } });
+  },
+
+  async 'games.startCultGunStash'(gameId: string, playerId: string) {
+    check(gameId, String);
+    check(playerId, String);
+
+    const player = await Players.findOneAsync(playerId);
+    if (!player || !player.isHost) {
+      throw new Meteor.Error('not-authorized', 'Only the host can start this');
+    }
+
+    // 3 second countdown
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
+    await Games.updateAsync(gameId, { $set: { gameState: GameState.CultGunStashInProgress } });
+  },
+
+  async 'games.finishCultGunStash'(
+    gameId: string,
+    playerId: string,
+    distributed: { [key: string]: number }
+  ) {
+    check(gameId, String);
+    check(playerId, String);
+    check(distributed, Object);
+
+    const player = await Players.findOneAsync(playerId);
+    if (!player || player.role !== Role.CultLeader) {
+      throw new Meteor.Error('not-authorized', 'Only the cult leader can do this');
+    }
+
+    // Update gun counts for all players
+    for (const [targetPlayerId, addedGuns] of Object.entries(distributed)) {
+      const targetPlayer = await Players.findOneAsync(targetPlayerId);
+      if (targetPlayer) {
+        await Players.updateAsync(targetPlayerId, {
+          $set: { gunCount: targetPlayer.gunCount + addedGuns },
+        });
+      }
+    }
+
+    await Games.updateAsync(gameId, { $set: { gameState: GameState.InProgress } });
+  },
+
+  async 'players.setConvertEligible'(playerId: string, isEligible: boolean) {
+    check(playerId, String);
+    check(isEligible, Boolean);
+
+    await Players.updateAsync(playerId, { $set: { isConvertEligible: isEligible } });
+  },
+
+  async 'games.startCultConversion'(gameId: string, playerId: string) {
+    check(gameId, String);
+    check(playerId, String);
+
+    const player = await Players.findOneAsync(playerId);
+    if (!player || !player.isHost) {
+      throw new Meteor.Error('not-authorized', 'Only the host can start this');
+    }
+
+    // 3 second countdown
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
+    await Games.updateAsync(gameId, { $set: { gameState: GameState.CultConversionInProgress } });
+  },
+
+  async 'players.convertToCult'(playerId: string) {
+    check(playerId, String);
+
+    await Players.updateAsync(playerId, { $set: { role: Role.Cultist } });
+  },
+
+  async 'games.finishCultConversion'(gameId: string, playerId: string) {
+    check(gameId, String);
+    check(playerId, String);
+
+    const player = await Players.findOneAsync(playerId);
+    if (!player || player.role !== Role.CultLeader) {
+      throw new Meteor.Error('not-authorized', 'Only the cult leader can do this');
+    }
+
+    await Games.updateAsync(gameId, { $set: { gameState: GameState.RoleReveal } });
+  },
+
+  async 'games.finishRoleReveal'(gameId: string, playerId: string) {
+    check(gameId, String);
+    check(playerId, String);
+
+    const player = await Players.findOneAsync(playerId);
+    if (!player || !player.isHost) {
+      throw new Meteor.Error('not-authorized', 'Only the host can do this');
+    }
+
+    await Games.updateAsync(gameId, { $set: { gameState: GameState.InProgress } });
+  },
 });
