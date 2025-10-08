@@ -23,12 +23,12 @@ export const CultGunStashInProgress: React.FC<CultGunStashInProgressProps> = ({
 }) => {
   const [distributed, setDistributed] = useState<{ [key: string]: number }>({});
 
-  const totalGuns = allPlayers.reduce((sum, p) => sum + p.gunCount, 0);
+  const totalGuns = 3; // Always 3 guns to distribute
   const distributedGuns = Object.values(distributed).reduce((sum, count) => sum + count, 0);
   const remainingGuns = totalGuns - distributedGuns;
 
   useEffect(() => {
-    if (playerRole === Role.CultLeader && remainingGuns === 0 && totalGuns > 0) {
+    if (playerRole === Role.CultLeader && remainingGuns === 0) {
       // Random delay between 2-5 seconds
       const delay = 2000 + Math.random() * 3000;
       const timer = setTimeout(() => {

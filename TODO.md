@@ -307,3 +307,30 @@ On the host phone, there is a "New Game" button that will start a new game.
 
 
 
+------
+------
+------
+
+
+# New TODO stuff to be fixed/changed
+
+## Fixes
+
+Final screen is not working properly. Need to investigate it further then fix.
+
+Make cult leader screen on CultConversion show all players and have ineligible ones show "Ineligible"
+
+## Additions
+
+During role selection, verify the roles.
+During role selection, add a "Go back to role selection" button. Possibly make this a new state.
+
+The countdowns are not working as well as I wanted them to. Need feedback on them at the very least. Possibly new states.
+First need to go find all of them, so that will be the first step of this fix.
+
+Add Host config/admin screen/panel.
+- Add a way to modify the players in the game (add/remove players, go back to role screen, etc.)
+
+Add way to start a new game with the current players.
+
+
