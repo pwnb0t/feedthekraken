@@ -1,5 +1,7 @@
 ﻿import React from 'react';
 import { Meteor } from 'meteor/meteor';
+import { useTracker } from 'meteor/react-meteor-data';
+import { Players } from '../api/collections';
 
 interface CultGunStashSetupProps {
   gameId: string;
@@ -14,6 +16,17 @@ export const CultGunStashSetup: React.FC<CultGunStashSetupProps> = ({
   isHost,
   gunCount,
 }) => {
+  const { allPlayers, currentPlayer } = useTracker(() => {
+    const allPlayers = Players.find({ gameId }).fetch();
+    const currentPlayer = Players.findOne(playerId);
+    return { allPlayers, currentPlayer };
+  }, [gameId, playerId]);
+
+  const readyCount = allPlayers.filter((p) => p.isReady).length;
+  const totalPlayers = allPlayers.length;
+  const allReady = readyCount === totalPlayers;
+  const isReady = currentPlayer?.isReady || false;
+
   const handleIncrement = () => {
     Meteor.call('players.setGunCount', playerId, gunCount + 1);
   };
@@ -22,6 +35,14 @@ export const CultGunStashSetup: React.FC<CultGunStashSetupProps> = ({
     if (gunCount > 0) {
       Meteor.call('players.setGunCount', playerId, gunCount - 1);
     }
+  };
+
+  const handleReady = () => {
+    Meteor.call('players.setReady', playerId, true);
+  };
+
+  const handleUndo = () => {
+    Meteor.call('players.setReady', playerId, false);
   };
 
   const handleStart = () => {
@@ -39,11 +60,11 @@ export const CultGunStashSetup: React.FC<CultGunStashSetupProps> = ({
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem' }}>
           <button
             onClick={handleDecrement}
-            disabled={gunCount <= 0}
+            disabled={gunCount <= 0 || isReady}
             style={{
               padding: '0.5rem 1rem',
               fontSize: '1.5rem',
-              cursor: gunCount <= 0 ? 'not-allowed' : 'pointer',
+              cursor: gunCount <= 0 || isReady ? 'not-allowed' : 'pointer',
             }}
           >
             -
@@ -53,10 +74,11 @@ export const CultGunStashSetup: React.FC<CultGunStashSetupProps> = ({
           </span>
           <button
             onClick={handleIncrement}
+            disabled={isReady}
             style={{
               padding: '0.5rem 1rem',
               fontSize: '1.5rem',
-              cursor: 'pointer',
+              cursor: isReady ? 'not-allowed' : 'pointer',
             }}
           >
             +
@@ -64,21 +86,75 @@ export const CultGunStashSetup: React.FC<CultGunStashSetupProps> = ({
         </div>
       </div>
 
-      {isHost && (
+      {!isReady ? (
         <button
-          onClick={handleStart}
+          onClick={handleReady}
           style={{
             width: '100%',
             padding: '0.75rem',
             fontSize: '1rem',
-            backgroundColor: '#28a745',
+            backgroundColor: '#007bff',
             color: 'white',
             border: 'none',
             borderRadius: '4px',
             cursor: 'pointer',
+            marginBottom: '1rem',
           }}
         >
-          Start Cult Gun Stash Step
+          Ready
+        </button>
+      ) : (
+        <>
+          <div
+            style={{
+              width: '100%',
+              padding: '0.75rem',
+              fontSize: '1rem',
+              backgroundColor: '#6c757d',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              marginBottom: '1rem',
+              textAlign: 'center',
+            }}
+          >
+            Waiting for other players ({readyCount}/{totalPlayers} ready)...
+          </div>
+          <button
+            onClick={handleUndo}
+            style={{
+              width: '100%',
+              padding: '0.75rem',
+              fontSize: '1rem',
+              backgroundColor: '#ffc107',
+              color: 'black',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              marginBottom: '1rem',
+            }}
+          >
+            Undo
+          </button>
+        </>
+      )}
+
+      {isHost && (
+        <button
+          onClick={handleStart}
+          disabled={!allReady}
+          style={{
+            width: '100%',
+            padding: '0.75rem',
+            fontSize: '1rem',
+            backgroundColor: allReady ? '#28a745' : '#6c757d',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: allReady ? 'pointer' : 'not-allowed',
+          }}
+        >
+          {allReady ? 'Start Cult Gun Stash Step' : `Waiting for other players (${readyCount}/${totalPlayers} ready)...`}
         </button>
       )}
     </div>

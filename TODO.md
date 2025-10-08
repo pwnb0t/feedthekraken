@@ -330,7 +330,12 @@ First need to go find all of them, so that will be the first step of this fix.
 
 Add Host config/admin screen/panel.
 - Add a way to modify the players in the game (add/remove players, go back to role screen, etc.)
+- Turn sound host-only/all/off (vibration stays on)
 
 Add way to start a new game with the current players.
 
+
+On Game Setup screen, on the host phone, add a message about "host should have their volumed turned up for sounds"
+Add vibration to all
+Add a way to disable sound
 

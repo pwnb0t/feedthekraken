@@ -23,6 +23,7 @@ Meteor.methods({
       role: Role.None,
       isConvertEligible: false,
       gunCount: 0,
+      isReady: false,
     });
 
     await Games.updateAsync(gameId, { $push: { players: playerId } });
@@ -53,6 +54,7 @@ Meteor.methods({
       role: Role.None,
       isConvertEligible: false,
       gunCount: 0,
+      isReady: false,
     });
 
     await Games.updateAsync(game._id!, { $push: { players: playerId } });
@@ -128,6 +130,13 @@ Meteor.methods({
     await Players.updateAsync(playerId, { $set: { gunCount } });
   },
 
+  async 'players.setReady'(playerId: string, isReady: boolean) {
+    check(playerId, String);
+    check(isReady, Boolean);
+
+    await Players.updateAsync(playerId, { $set: { isReady } });
+  },
+
   async 'games.startCultGunStash'(gameId: string, playerId: string) {
     check(gameId, String);
     check(playerId, String);
@@ -135,6 +144,12 @@ Meteor.methods({
     const player = await Players.findOneAsync(playerId);
     if (!player || !player.isHost) {
       throw new Meteor.Error('not-authorized', 'Only the host can start this');
+    }
+
+    // Reset all players' ready status
+    const allPlayers = await Players.find({ gameId }).fetchAsync();
+    for (const p of allPlayers) {
+      await Players.updateAsync(p._id!, { $set: { isReady: false } });
     }
 
     // 3 second countdown

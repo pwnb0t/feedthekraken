@@ -28,6 +28,7 @@ export interface Player {
   role: Role;
   isConvertEligible: boolean;
   gunCount: number;
+  isReady: boolean;
 }
 
 export interface Game {
