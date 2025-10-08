@@ -31,6 +31,22 @@ Meteor.methods({
     return { gameId, playerId, roomCode };
   },
 
+  async 'games.reconnect'(playerId: string) {
+    check(playerId, String);
+
+    const player = await Players.findOneAsync(playerId);
+    if (!player) {
+      throw new Meteor.Error('player-not-found', 'Player not found');
+    }
+
+    const game = await Games.findOneAsync(player.gameId);
+    if (!game) {
+      throw new Meteor.Error('game-not-found', 'Game not found');
+    }
+
+    return { gameId: game._id!, playerId: player._id!, roomCode: game.roomCode };
+  },
+
   async 'games.join'(roomCode: string, playerName: string) {
     check(roomCode, String);
     check(playerName, String);

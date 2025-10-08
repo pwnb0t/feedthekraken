@@ -12,9 +12,9 @@ export const App = () => {
   // Try to reconnect on mount
   useEffect(() => {
     const session = loadSession();
-    if (session) {
-      // Attempt to rejoin the game with saved credentials
-      Meteor.call('games.join', session.roomCode, session.playerName, (error: any, result: any) => {
+    if (session && session.playerId) {
+      // Attempt to reconnect using the saved playerId
+      Meteor.call('games.reconnect', session.playerId, (error: any, result: any) => {
         if (error) {
           // Session is invalid, clear it
           console.log('Failed to reconnect to saved session:', error.reason);
@@ -24,9 +24,9 @@ export const App = () => {
           // Successfully reconnected
           setGameId(result.gameId);
           setPlayerId(result.playerId);
-          // Update session with potentially new IDs
+          // Update session (room code might have changed)
           saveSession({
-            roomCode: session.roomCode,
+            roomCode: result.roomCode,
             playerName: session.playerName,
             gameId: result.gameId,
             playerId: result.playerId,

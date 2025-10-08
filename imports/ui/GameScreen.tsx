@@ -13,7 +13,7 @@ import { CultConversionSetup } from './CultConversionSetup';
 import { CultConversionInProgress } from './CultConversionInProgress';
 import { RoleRevealState } from './RoleRevealState';
 import { GameOverState } from './GameOverState';
-import { clearSession, saveSession } from '../utils/sessionStorage';
+import { clearSession, loadSession, saveSession } from '../utils/sessionStorage';
 
 interface GameScreenProps {
   gameId: string;
@@ -51,17 +51,21 @@ export const GameScreen: React.FC<GameScreenProps> = ({ gameId, playerId }) => {
     }
   }, [loading, game, player]);
 
-  // Update session whenever game or player data changes
+  // Update session only when room code changes (e.g., "New Game with Different Players")
   useEffect(() => {
-    if (game && player) {
-      saveSession({
-        roomCode: game.roomCode,
-        playerName: player.name,
-        gameId: game._id!,
-        playerId: player._id!,
-      });
+    if (game && player && player._id === playerId) {
+      const session = loadSession();
+      // Only update if room code actually changed
+      if (session && session.roomCode !== game.roomCode) {
+        saveSession({
+          roomCode: game.roomCode,
+          playerName: player.name,
+          gameId: game._id!,
+          playerId: player._id!,
+        });
+      }
     }
-  }, [game?.roomCode, player?.name, game?._id, player?._id]);
+  }, [game?.roomCode, playerId, player?._id, game?._id, player?.name]);
 
   if (loading) {
     return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>;
