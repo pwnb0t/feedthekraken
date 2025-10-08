@@ -47,7 +47,7 @@ GameState enum:
 
 ## Create Game
 
-Creates a Game with a random RoomCode: 4 char [A-Z0-9]
+Creates a Game with a random RoomCode: 4 char [A-HJ-NP-Z]
 
 takes them to GameState.Setup as the host
 
@@ -207,7 +207,7 @@ Evan | 2 | +
 Josh | 3 | +
 ...
 
-When the last gun is distributed, wait random 2-5 seconds then change gameState to GameState.InProgress
+When the last gun is distributed, wait random 2-5 seconds, play boat-horn.mp3, then change gameState to GameState.InProgress
 
 ### Non-Cult Leader View
 show text:
@@ -302,6 +302,7 @@ After 3 second countdown, whether or not Host clicked Ok button, Host phone chan
 On all phones, show a table of all players and their roles.
 
 
+On the host phone, there is a "New Game" button that will start a new game.
 
 
 
