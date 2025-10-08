@@ -249,9 +249,10 @@ Meteor.methods({
     check(gameId, String);
     check(playerId, String);
 
-    const player = await Players.findOneAsync(playerId);
-    if (!player || !player.isHost) {
-      throw new Meteor.Error('not-authorized', 'Only the host can do this');
+    // Reset all players' ready status
+    const allPlayers = await Players.find({ gameId }).fetchAsync();
+    for (const p of allPlayers) {
+      await Players.updateAsync(p._id!, { $set: { isReady: false } });
     }
 
     await Games.updateAsync(gameId, { $set: { gameState: GameState.InProgress } });
