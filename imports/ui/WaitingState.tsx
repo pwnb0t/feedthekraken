@@ -84,7 +84,7 @@ export const WaitingState: React.FC<WaitingStateProps> = ({
           <button
             onClick={() => {
               const audio = new Audio('/assets/boat-horn.mp3');
-              audio.play();
+              audio.play().catch((err) => console.error('Failed to play audio:', err));
             }}
             style={{
               padding: '0.75rem 1.5rem',

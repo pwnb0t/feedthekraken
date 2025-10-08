@@ -45,7 +45,7 @@ export const CultGunStashInProgress: React.FC<CultGunStashInProgressProps> = ({
       const timer = setTimeout(() => {
         // Play sound on host device only
         const audio = new Audio('/assets/boat-horn.mp3');
-        audio.play();
+        audio.play().catch((err) => console.error('Failed to play audio:', err));
 
         // Save distributed guns and return to InProgress
         Meteor.call('games.finishCultGunStash', gameId, playerId, distributed);
