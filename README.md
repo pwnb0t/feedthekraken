@@ -2,6 +2,8 @@
 
 We play this game at a big table. During the cultist step, not everyone can reach the center of the table. This app provides a way to do the cultist steps from their phone.
 
+This is particularly helpful for those with accessibility or mobility needs.
+
 
 # Credits
 
