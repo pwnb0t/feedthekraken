@@ -1,0 +1,24 @@
+services:
+  app:
+    build: .
+    container_name: meteor_app
+    ports:
+      - "3000:3000"
+    environment:
+      ROOT_URL: "https://your-domain.com"
+      MONGO_URL: "mongodb://mongo:27017/meteor"
+      PORT: "3000"
+    depends_on:
+      - mongo
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:6
+    container_name: meteor_mongo
+    restart: unless-stopped
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
+
