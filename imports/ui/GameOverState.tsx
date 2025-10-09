@@ -1,6 +1,7 @@
-﻿import React from 'react';
+﻿import React, { useState } from 'react';
 import { Meteor } from 'meteor/meteor';
 import { Role } from '../api/collections';
+import { ConfirmDialog } from './ConfirmDialog';
 
 interface PlayerInfo {
   name: string;
@@ -20,6 +21,18 @@ export const GameOverState: React.FC<GameOverStateProps> = ({
   isHost,
   allPlayers,
 }) => {
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
+
   const getRoleLabel = (role: Role) => {
     switch (role) {
       case Role.Sailor:
@@ -38,21 +51,31 @@ export const GameOverState: React.FC<GameOverStateProps> = ({
   };
 
   const handleNewGameSamePlayers = () => {
-    if (confirm('Start a new game with the same players? Everyone will need to select roles again.')) {
-      Meteor.call('games.newGameSamePlayers', gameId, playerId);
-    }
+    setConfirmDialog({
+      isOpen: true,
+      title: 'New Game - Same Players',
+      message: 'Start a new game with the same players? Everyone will need to select roles again.',
+      onConfirm: () => {
+        Meteor.call('games.newGameSamePlayers', gameId, playerId);
+        setConfirmDialog({ ...confirmDialog, isOpen: false });
+      },
+    });
   };
 
   const handleNewGameDifferentPlayers = () => {
-    if (confirm('Start a new game with different players? All other players will be removed from the game.')) {
-      Meteor.call('games.newGameDifferentPlayers', gameId, playerId, (error: any) => {
-        if (error) {
-          alert(error.reason || 'Error starting new game');
-        }
-        // No need to do anything else - the reactive subscription will automatically
-        // update to show the Setup state with the new room code
-      });
-    }
+    setConfirmDialog({
+      isOpen: true,
+      title: 'New Game - Different Players',
+      message: 'Start a new game with different players? All other players will be removed from the game.',
+      onConfirm: () => {
+        Meteor.call('games.newGameDifferentPlayers', gameId, playerId, (error: any) => {
+          if (error) {
+            alert(error.reason || 'Error starting new game');
+          }
+        });
+        setConfirmDialog({ ...confirmDialog, isOpen: false });
+      },
+    });
   };
 
   return (
@@ -125,6 +148,14 @@ export const GameOverState: React.FC<GameOverStateProps> = ({
           <p>Waiting for host to start a new game...</p>
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        onConfirm={confirmDialog.onConfirm}
+        onCancel={() => setConfirmDialog({ ...confirmDialog, isOpen: false })}
+      />
     </div>
   );
 };

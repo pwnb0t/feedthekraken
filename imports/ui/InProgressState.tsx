@@ -1,6 +1,7 @@
-﻿import React from 'react';
+﻿import React, { useState } from 'react';
 import { Meteor } from 'meteor/meteor';
 import { GameState } from '../api/collections';
+import { ConfirmDialog } from './ConfirmDialog';
 
 interface InProgressStateProps {
   gameId: string;
@@ -9,14 +10,19 @@ interface InProgressStateProps {
 }
 
 export const InProgressState: React.FC<InProgressStateProps> = ({ gameId, playerId, isHost }) => {
+  const [showEndGameConfirm, setShowEndGameConfirm] = useState(false);
+
   const handleSelectAction = (action: GameState) => {
     Meteor.call('games.setGameState', gameId, playerId, action);
   };
 
   const handleEndGame = () => {
-    if (confirm('Are you sure you want to end the game?')) {
-      Meteor.call('games.setGameState', gameId, playerId, GameState.GameOver);
-    }
+    setShowEndGameConfirm(true);
+  };
+
+  const confirmEndGame = () => {
+    Meteor.call('games.setGameState', gameId, playerId, GameState.GameOver);
+    setShowEndGameConfirm(false);
   };
 
   if (!isHost) {
@@ -96,6 +102,15 @@ export const InProgressState: React.FC<InProgressStateProps> = ({ gameId, player
       >
         End Game
       </button>
+
+      <ConfirmDialog
+        isOpen={showEndGameConfirm}
+        title="End Game"
+        message="Are you sure you want to end the game?"
+        confirmText="End Game"
+        onConfirm={confirmEndGame}
+        onCancel={() => setShowEndGameConfirm(false)}
+      />
     </div>
   );
 };

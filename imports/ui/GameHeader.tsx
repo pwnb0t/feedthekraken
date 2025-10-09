@@ -1,6 +1,7 @@
 ﻿import React, { useState } from 'react';
 import { GameState } from '../api/collections';
 import { clearSession } from '../utils/sessionStorage';
+import { ConfirmDialog } from './ConfirmDialog';
 
 interface GameHeaderProps {
   playerName: string;
@@ -10,6 +11,7 @@ interface GameHeaderProps {
 
 export const GameHeader: React.FC<GameHeaderProps> = ({ playerName, roomCode, gameState }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
 
   const getFriendlyGameState = (state: GameState): string => {
     switch (state) {
@@ -35,10 +37,13 @@ export const GameHeader: React.FC<GameHeaderProps> = ({ playerName, roomCode, ga
   };
 
   const handleExit = () => {
-    if (confirm('Are you sure you want to exit? You will need to rejoin the game.')) {
-      clearSession();
-      window.location.reload();
-    }
+    setIsMenuOpen(false);
+    setShowExitConfirm(true);
+  };
+
+  const confirmExit = () => {
+    clearSession();
+    window.location.reload();
   };
 
   return (
@@ -130,6 +135,15 @@ export const GameHeader: React.FC<GameHeaderProps> = ({ playerName, roomCode, ga
           </div>
         </>
       )}
+
+      <ConfirmDialog
+        isOpen={showExitConfirm}
+        title="Exit Game"
+        message="Are you sure you want to exit? You will need to rejoin the game."
+        confirmText="Exit"
+        onConfirm={confirmExit}
+        onCancel={() => setShowExitConfirm(false)}
+      />
     </div>
   );
 };
