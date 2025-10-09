@@ -76,7 +76,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({ gameId, playerId }) => {
 
   return (
     <div>
-      <GameHeader playerName={player!.name} roomCode={game!.roomCode} gameState={game!.gameState} />
+      <GameHeader playerName={player!.name} roomCode={game!.roomCode} gameState={game!.gameState} playerRole={player!.role} />
 
       {game!.gameState === GameState.Setup && (
         <SetupState
