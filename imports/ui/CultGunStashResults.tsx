@@ -20,6 +20,14 @@ export const CultGunStashResults: React.FC<CultGunStashResultsProps> = ({
     return { allPlayers, currentPlayer };
   }, [gameId, playerId]);
 
+  // Play the boat horn on the host device only when results appear
+  useEffect(() => {
+    if (currentPlayer?.isHost) {
+      const audio = new Audio('/assets/boat-horn.mp3');
+      audio.play().catch((err) => console.error('Failed to play audio:', err));
+    }
+  }, [currentPlayer?._id]);
+
   const readyCount = allPlayers.filter((p) => p.isReady).length;
   const totalPlayers = allPlayers.length;
   const allReady = readyCount === totalPlayers;

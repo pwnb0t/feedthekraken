@@ -43,11 +43,7 @@ export const CultGunStashInProgress: React.FC<CultGunStashInProgressProps> = ({
     if (playerRole === Role.CultLeader && cultLeaderReady && remainingGuns === 0) {
       const delay = 3000;
       const timer = setTimeout(() => {
-        // Play sound on host device only
-        const audio = new Audio('/assets/boat-horn.mp3');
-        audio.play().catch((err) => console.error('Failed to play audio:', err));
-
-        // Save distributed guns and return to InProgress
+        // Save distributed guns and advance state
         Meteor.call('games.finishCultGunStash', gameId, playerId, distributed);
       }, delay);
 
