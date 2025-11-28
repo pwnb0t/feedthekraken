@@ -105,6 +105,8 @@ sudo docker run -d --name feedthekraken --restart unless-stopped   -p 3000:3000 
 # NOTE: yes, it still has the wrong domain, it should be:
 sudo docker run -d --name feedthekraken --restart unless-stopped   -p 3000:3000   -e ROOT_URL=https://pwnb0t.synology.me:3000   -e MONGO_URL='mongodb+srv://<user>:<pw>@feedthekraken.XXXXXX.mongodb.net/meteor?retryWrites=true&w=majority&appName=feedthekraken'   -e PORT=3000 -e HTTP_FORWARDED_COUNT=1   feedthekraken:runtime
 
+See Deploy.secret.md or 1password "FeedTheKraken MongoDB" for original cmd with pw
+
 # It probably has something to do with me still having the dev move or non-secure stuff running in meteor so it allows any URL or something. I also don't care enough right now to change it.
 
 
