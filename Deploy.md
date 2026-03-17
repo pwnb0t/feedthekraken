@@ -38,7 +38,8 @@ I did a bunch of steps from ChatGPT around trying to set up a Let's Encrypt cert
 ### Stuff that I think worked and is necessary
 
 Control Panel -> External Access -> DDNS
-This should already be configured for pwnb0t.synology.me and works great.
+This should already be configured for your Synology DDNS and/or custom domain.
+Current canonical public host: kraken.pwnb0t.com
 
 Control Panel -> External Access -> Router Configuration
 
@@ -47,7 +48,8 @@ Protocol: TCP
 Local Port: 3000
 Remote Port: 3000 (I tried 443 at one point and that is not ok, guessing it interferes with Synology)
 
-This should now forward traffic from pwnb0t.synology.me:3000 to local 3000
+Use Synology Reverse Proxy so public traffic to kraken.pwnb0t.com is handled on 443 and forwarded to local port 3000.
+Also add an HTTP (80) rule that redirects to HTTPS (443) for kraken.pwnb0t.com.
 
 
 ## Build app on dev and copy to Synology NAS
@@ -99,33 +101,32 @@ docker rm -f feedthekraken 2>/dev/null || true
 # sudo docker run -d --name feedthekraken --restart unless-stopped   -p 127.0.0.1:3000:3000   -e ROOT_URL=https://home.evanstenmark.com   -e MONGO_URL='mongodb+srv://<user>:<pw>@feedthekraken.XXXXX.mongodb.net/meteor?retryWrites=true&w=majority&appName=feedthekraken'   -e PORT=3000   -e HTTP_FORWARDED_COUNT=1   feedthekraken:runtime
 # Had issues with this I was trying to debug, then ultimately switched to the below command. I don't know that the below command is necessary to remove the localhost restriction. But I also don't care about allowing connections from outside of the Synology NAS, since it's just on the LAN anyway.
 
-# The command that's currently running while I'm writing this doc (with user/pw stripped):
-sudo docker run -d --name feedthekraken --restart unless-stopped   -p 3000:3000   -e ROOT_URL=https://home.<name>.com   -e MONGO_URL='mongodb+srv://<user>:<pw>@feedthekraken.XXXXXX.mongodb.net/meteor?retryWrites=true&w=majority&appName=feedthekraken'   -e PORT=3000 -e HTTP_FORWARDED_COUNT=1   feedthekraken:runtime
+# Current recommended run command (with user/pw stripped):
+sudo docker run -d --name feedthekraken --restart unless-stopped \
+  -p 3000:3000 \
+  -e ROOT_URL=https://kraken.pwnb0t.com \
+  -e MONGO_URL='mongodb+srv://<user>:<pw>@feedthekraken.XXXXXX.mongodb.net/meteor?retryWrites=true&w=majority&appName=feedthekraken' \
+  -e PORT=3000 \
+  -e HTTP_FORWARDED_COUNT=1 \
+  feedthekraken:runtime
 
-# NOTE: yes, it still has the wrong domain, it should be:
-sudo docker run -d --name feedthekraken --restart unless-stopped   -p 3000:3000   -e ROOT_URL=https://pwnb0t.synology.me:3000   -e MONGO_URL='mongodb+srv://<user>:<pw>@feedthekraken.XXXXXX.mongodb.net/meteor?retryWrites=true&w=majority&appName=feedthekraken'   -e PORT=3000 -e HTTP_FORWARDED_COUNT=1   feedthekraken:runtime
-
-See Deploy.secret.md or 1password "FeedTheKraken MongoDB" for original cmd with pw
-
-# It probably has something to do with me still having the dev move or non-secure stuff running in meteor so it allows any URL or something. I also don't care enough right now to change it.
-
-
-# original from chatgpt
+# If updating an existing container:
 docker rm -f feedthekraken
 docker run -d --name feedthekraken --restart unless-stopped \
--p 3000:3000 \
--e ROOT_URL=https://home.<name>.com \
--e MONGO_URL='<<your Atlas URI>>' \
--e PORT=3000 -e HTTP_FORWARDED_COUNT=1 \
-feedthekraken:runtime
+  -p 3000:3000 \
+  -e ROOT_URL=https://kraken.pwnb0t.com \
+  -e MONGO_URL='<<your Atlas URI>>' \
+  -e PORT=3000 \
+  -e HTTP_FORWARDED_COUNT=1 \
+  feedthekraken:runtime
 
 
 
 ## Deployed App URL
 
-Ultimate deployed URL:
+Canonical deployed URL:
 
-http://pwnb0t.synology.me:3000/
+https://kraken.pwnb0t.com/
 
 
 
