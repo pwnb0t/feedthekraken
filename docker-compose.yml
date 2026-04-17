@@ -13,8 +13,16 @@ services:
     restart: unless-stopped
 
   mongo:
-    image: mongo:6
+    image: mongo:4.4
     container_name: meteor_mongo
+    command:
+      - --bind_ip_all
+      - --wiredTigerCacheSizeGB
+      - "0.25"
+      - --setParameter
+      - diagnosticDataCollectionEnabled=false
+      - --profile
+      - "0"
     restart: unless-stopped
     volumes:
       - mongo_data:/data/db

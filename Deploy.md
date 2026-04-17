@@ -14,17 +14,16 @@ I was doing to use one of my domains that I register through Hover with a subdom
 # here's the chatgpt thread if it still exists:
 https://chatgpt.com/g/g-p-68e5343ad5608191a5ece91ff5895380-feedthekraken/c/68e6d06d-7e1c-832b-b152-0a5705c5c020
 
-## Mongodb Atlas
+## MongoDB (local on NAS)
 
-What ended up working was using the synology DDNS and the docker container on the NAS but building the app locally and deploying it there.
+Current setup uses a local MongoDB container on the Synology NAS (not Atlas), to avoid public-IP allowlist churn.
 
-Registered for a free mongodb atlas account and deployed to a free tier instance. Get the link from that instance like:
+- Container: `feedthekraken-mongo`
+- Image: `mongo:4.4` (Mongo 5+ requires AVX; this NAS CPU does not support AVX)
+- Data path: `/volume1/docker/feedthekraken/mongo-data`
+- App DB URL: `mongodb://feedthekraken-mongo:27017/meteor?directConnection=true`
 
-mongodb+srv://<user>:<pw>@feedthekraken.XXXXX.mongodb.net/?retryWrites=true&w=majority&appName=feedthekraken
-
-then add /meteor to the path (represents the database):
-
-mongodb+srv://<user>:<pw>@feedthekraken.XXXXX.mongodb.net/meteor?retryWrites=true&w=majority&appName=feedthekraken
+If you ever move back to Atlas, use a standard `mongodb+srv://.../meteor` URI in `MONGO_URL`.
 
 
 ## Synology NAS DSM Configuration
@@ -101,21 +100,28 @@ docker rm -f feedthekraken 2>/dev/null || true
 # sudo docker run -d --name feedthekraken --restart unless-stopped   -p 127.0.0.1:3000:3000   -e ROOT_URL=https://home.evanstenmark.com   -e MONGO_URL='mongodb+srv://<user>:<pw>@feedthekraken.XXXXX.mongodb.net/meteor?retryWrites=true&w=majority&appName=feedthekraken'   -e PORT=3000   -e HTTP_FORWARDED_COUNT=1   feedthekraken:runtime
 # Had issues with this I was trying to debug, then ultimately switched to the below command. I don't know that the below command is necessary to remove the localhost restriction. But I also don't care about allowing connections from outside of the Synology NAS, since it's just on the LAN anyway.
 
-# Current recommended run command (with user/pw stripped):
-sudo docker run -d --name feedthekraken --restart unless-stopped \
-  -p 3000:3000 \
-  -e ROOT_URL=https://kraken.pwnb0t.com \
-  -e MONGO_URL='mongodb+srv://<user>:<pw>@feedthekraken.XXXXXX.mongodb.net/meteor?retryWrites=true&w=majority&appName=feedthekraken' \
-  -e PORT=3000 \
-  -e HTTP_FORWARDED_COUNT=1 \
-  feedthekraken:runtime
+# Current recommended run commands (local Mongo on NAS)
 
-# If updating an existing container:
-docker rm -f feedthekraken
+docker network create ftk_net 2>/dev/null || true
+
+# Mongo (tiny-ish footprint)
+docker rm -f feedthekraken-mongo 2>/dev/null || true
+docker run -d --name feedthekraken-mongo --restart unless-stopped \
+  --network ftk_net \
+  -v /volume1/docker/feedthekraken/mongo-data:/data/db \
+  mongo:4.4 \
+  --bind_ip_all \
+  --wiredTigerCacheSizeGB 0.25 \
+  --setParameter diagnosticDataCollectionEnabled=false \
+  --profile 0
+
+# App
+docker rm -f feedthekraken 2>/dev/null || true
 docker run -d --name feedthekraken --restart unless-stopped \
-  -p 3000:3000 \
+  --network ftk_net \
+  -p 127.0.0.1:3000:3000 \
   -e ROOT_URL=https://kraken.pwnb0t.com \
-  -e MONGO_URL='<<your Atlas URI>>' \
+  -e MONGO_URL='mongodb://feedthekraken-mongo:27017/meteor?directConnection=true' \
   -e PORT=3000 \
   -e HTTP_FORWARDED_COUNT=1 \
   feedthekraken:runtime
